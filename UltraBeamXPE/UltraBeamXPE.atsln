@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Atmel Studio Solution File, Format Version 11.00
+Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "UltraBeamXPE", "UltraBeamXPE\UltraBeamXPE.cproj", "{D9F25BE1-5398-41D4-B70D-2132EBF48D5B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|AVR = Debug|AVR
+		Release|AVR = Release|AVR
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D9F25BE1-5398-41D4-B70D-2132EBF48D5B}.Debug|AVR.ActiveCfg = Debug|AVR
+		{D9F25BE1-5398-41D4-B70D-2132EBF48D5B}.Debug|AVR.Build.0 = Debug|AVR
+		{D9F25BE1-5398-41D4-B70D-2132EBF48D5B}.Release|AVR.ActiveCfg = Debug|AVR
+		{D9F25BE1-5398-41D4-B70D-2132EBF48D5B}.Release|AVR.Build.0 = Debug|AVR
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,728 @@
+
+UltraBeamXPE.elf:     file format elf32-avr
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         000003ce  00000000  00000000  00000074  2**1
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .bss          00000010  00800060  00800060  00000442  2**0
+                  ALLOC
+  2 .comment      00000030  00000000  00000000  00000442  2**0
+                  CONTENTS, READONLY
+  3 .debug_aranges 00000070  00000000  00000000  00000472  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  4 .debug_info   00000512  00000000  00000000  000004e2  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  5 .debug_abbrev 0000020c  00000000  00000000  000009f4  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  6 .debug_line   0000029d  00000000  00000000  00000c00  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  7 .debug_frame  0000017c  00000000  00000000  00000ea0  2**2
+                  CONTENTS, READONLY, DEBUGGING
+  8 .debug_str    0000027d  00000000  00000000  0000101c  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  9 .debug_loc    000005a4  00000000  00000000  00001299  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 10 .debug_ranges 00000078  00000000  00000000  0000183d  2**0
+                  CONTENTS, READONLY, DEBUGGING
+
+Disassembly of section .text:
+
+00000000 <__vectors>:
+   0:	12 c0       	rjmp	.+36     	; 0x26 <__ctors_end>
+   2:	70 c0       	rjmp	.+224    	; 0xe4 <__vector_1>
+   4:	14 c1       	rjmp	.+552    	; 0x22e <__vector_2>
+   6:	1d c0       	rjmp	.+58     	; 0x42 <__bad_interrupt>
+   8:	85 c0       	rjmp	.+266    	; 0x114 <__vector_4>
+   a:	92 c0       	rjmp	.+292    	; 0x130 <__vector_5>
+   c:	1a c0       	rjmp	.+52     	; 0x42 <__bad_interrupt>
+   e:	19 c0       	rjmp	.+50     	; 0x42 <__bad_interrupt>
+  10:	18 c0       	rjmp	.+48     	; 0x42 <__bad_interrupt>
+  12:	17 c0       	rjmp	.+46     	; 0x42 <__bad_interrupt>
+  14:	16 c0       	rjmp	.+44     	; 0x42 <__bad_interrupt>
+  16:	15 c0       	rjmp	.+42     	; 0x42 <__bad_interrupt>
+  18:	14 c0       	rjmp	.+40     	; 0x42 <__bad_interrupt>
+  1a:	86 c1       	rjmp	.+780    	; 0x328 <__vector_13>
+  1c:	12 c0       	rjmp	.+36     	; 0x42 <__bad_interrupt>
+  1e:	11 c0       	rjmp	.+34     	; 0x42 <__bad_interrupt>
+  20:	10 c0       	rjmp	.+32     	; 0x42 <__bad_interrupt>
+  22:	0f c0       	rjmp	.+30     	; 0x42 <__bad_interrupt>
+  24:	0e c0       	rjmp	.+28     	; 0x42 <__bad_interrupt>
+
+00000026 <__ctors_end>:
+  26:	11 24       	eor	r1, r1
+  28:	1f be       	out	0x3f, r1	; 63
+  2a:	cf ed       	ldi	r28, 0xDF	; 223
+  2c:	cd bf       	out	0x3d, r28	; 61
+
+0000002e <__do_clear_bss>:
+  2e:	20 e0       	ldi	r18, 0x00	; 0
+  30:	a0 e6       	ldi	r26, 0x60	; 96
+  32:	b0 e0       	ldi	r27, 0x00	; 0
+  34:	01 c0       	rjmp	.+2      	; 0x38 <.do_clear_bss_start>
+
+00000036 <.do_clear_bss_loop>:
+  36:	1d 92       	st	X+, r1
+
+00000038 <.do_clear_bss_start>:
+  38:	a0 37       	cpi	r26, 0x70	; 112
+  3a:	b2 07       	cpc	r27, r18
+  3c:	e1 f7       	brne	.-8      	; 0x36 <.do_clear_bss_loop>
+  3e:	02 d0       	rcall	.+4      	; 0x44 <main>
+  40:	c4 c1       	rjmp	.+904    	; 0x3ca <_exit>
+
+00000042 <__bad_interrupt>:
+  42:	de cf       	rjmp	.-68     	; 0x0 <__vectors>
+
+00000044 <main>:
+uint8_t get_key_press( uint8_t key_mask );
+
+
+int main(void)
+{
+	DDRB |= (1<<PB0) | (1<<PB1) | (1<<PB2) | (1<<PB3);
+  44:	87 b3       	in	r24, 0x17	; 23
+  46:	8f 60       	ori	r24, 0x0F	; 15
+  48:	87 bb       	out	0x17, r24	; 23
+	
+    OCR0A   = 77;							// Legt den Wert ZUM Überlaufes fest ( ca. jede 10 ms.)
+  4a:	8d e4       	ldi	r24, 0x4D	; 77
+  4c:	86 bf       	out	0x36, r24	; 54
+	TCCR0A |= (1<<WGM01);					// Compare Match (Normal Mode) keine Funktion am PIN &&    TIFR |= 0x01;			// Clear Interrupt Flag ( Wird nur für Polling benötigt! Nicht für Interrupt )
+  4e:	80 b7       	in	r24, 0x30	; 48
+  50:	82 60       	ori	r24, 0x02	; 2
+  52:	80 bf       	out	0x30, r24	; 48
+    TIMSK  |= (1<<OCIE0A);					// Compare Match Interrupt enable
+  54:	89 b7       	in	r24, 0x39	; 57
+  56:	81 60       	ori	r24, 0x01	; 1
+  58:	89 bf       	out	0x39, r24	; 57
+    TCCR0B |= ((1<<CS02) | (1<<CS00));		// Prescaler auf 1024 setzen (F_CPU/1024)
+  5a:	83 b7       	in	r24, 0x33	; 51
+  5c:	85 60       	ori	r24, 0x05	; 5
+  5e:	83 bf       	out	0x33, r24	; 51
+	
+	OCR1A   = HELLIGKEIT;					// Legt den Wert des Überlaufes fest
+  60:	88 eb       	ldi	r24, 0xB8	; 184
+  62:	9b e0       	ldi	r25, 0x0B	; 11
+  64:	9b bd       	out	0x2b, r25	; 43
+  66:	8a bd       	out	0x2a, r24	; 42
+	TCCR1A |= 0x00;							// Compare Match (Normal Mode) keine Funktion am PIN
+  68:	8f b5       	in	r24, 0x2f	; 47
+  6a:	8f bd       	out	0x2f, r24	; 47
+	TIFR   |= 0x01;							// Clear Interrupt Flag ( Wird nur für Polling benötigt! Nicht für Interrupt )
+  6c:	88 b7       	in	r24, 0x38	; 56
+  6e:	81 60       	ori	r24, 0x01	; 1
+  70:	88 bf       	out	0x38, r24	; 56
+	TIMSK  |= ((1<<OCIE1A) | (1<<TOIE1));							// Compare Match Interrupt enable
+  72:	89 b7       	in	r24, 0x39	; 57
+  74:	80 6c       	ori	r24, 0xC0	; 192
+  76:	89 bf       	out	0x39, r24	; 57
+	TCCR1B |= (1<<CS10);					// Prescaler auf 0 setzen (F_CPU)
+  78:	8e b5       	in	r24, 0x2e	; 46
+  7a:	81 60       	ori	r24, 0x01	; 1
+  7c:	8e bd       	out	0x2e, r24	; 46
+	TIMER1_STOP;
+  7e:	8e b5       	in	r24, 0x2e	; 46
+  80:	8e 7f       	andi	r24, 0xFE	; 254
+  82:	8e bd       	out	0x2e, r24	; 46
+	
+	GIMSK  |= ((1<<INT0) | (1<<INT1));		// Interrupt "INT0 & INT1" aktivieren
+  84:	8b b7       	in	r24, 0x3b	; 59
+  86:	80 6c       	ori	r24, 0xC0	; 192
+  88:	8b bf       	out	0x3b, r24	; 59
+	
+	sei();									// Interrupts global aktivieren
+  8a:	78 94       	sei
+			
+	Auto_Off = ABSCHALTZEIT;
+  8c:	80 ef       	ldi	r24, 0xF0	; 240
+  8e:	90 e0       	ldi	r25, 0x00	; 0
+  90:	90 93 6a 00 	sts	0x006A, r25
+  94:	80 93 69 00 	sts	0x0069, r24
+	OCR1A = 800;
+  98:	80 e2       	ldi	r24, 0x20	; 32
+  9a:	93 e0       	ldi	r25, 0x03	; 3
+  9c:	9b bd       	out	0x2b, r25	; 43
+  9e:	8a bd       	out	0x2a, r24	; 42
+		
+while(1)
+{
+
+	
+	if ((Auto_Off == ABSCHALTZEIT) || (!(TCCR1B & (1<<CS10))))			// Ist Auto_Off = ABSCHALTZEIT, dann schlafen!
+  a0:	80 91 69 00 	lds	r24, 0x0069
+  a4:	90 91 6a 00 	lds	r25, 0x006A
+  a8:	80 3f       	cpi	r24, 0xF0	; 240
+  aa:	91 05       	cpc	r25, r1
+  ac:	19 f0       	breq	.+6      	; 0xb4 <main+0x70>
+  ae:	0e b4       	in	r0, 0x2e	; 46
+  b0:	00 fc       	sbrc	r0, 0
+  b2:	f6 cf       	rjmp	.-20     	; 0xa0 <main+0x5c>
+	{	
+		
+		Auto_Off=0;
+  b4:	10 92 6a 00 	sts	0x006A, r1
+  b8:	10 92 69 00 	sts	0x0069, r1
+		TIMER1_STOP;	
+  bc:	8e b5       	in	r24, 0x2e	; 46
+  be:	8e 7f       	andi	r24, 0xFE	; 254
+  c0:	8e bd       	out	0x2e, r24	; 46
+		TCNT1 = 0;			
+  c2:	1d bc       	out	0x2d, r1	; 45
+  c4:	1c bc       	out	0x2c, r1	; 44
+		XPE_1_AUS; XPE_2_AUS; XPE_3_AUS; XPE_4_AUS;
+  c6:	c0 98       	cbi	0x18, 0	; 24
+  c8:	c1 98       	cbi	0x18, 1	; 24
+  ca:	c2 98       	cbi	0x18, 2	; 24
+  cc:	c3 98       	cbi	0x18, 3	; 24
+		set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+  ce:	85 b7       	in	r24, 0x35	; 53
+  d0:	80 65       	ori	r24, 0x50	; 80
+  d2:	85 bf       	out	0x35, r24	; 53
+		sleep_mode();							// Setzt den µC (nach Batteriewechsel) in den sleep_mode
+  d4:	85 b7       	in	r24, 0x35	; 53
+  d6:	80 62       	ori	r24, 0x20	; 32
+  d8:	85 bf       	out	0x35, r24	; 53
+  da:	88 95       	sleep
+  dc:	85 b7       	in	r24, 0x35	; 53
+  de:	8f 7d       	andi	r24, 0xDF	; 223
+  e0:	85 bf       	out	0x35, r24	; 53
+  e2:	de cf       	rjmp	.-68     	; 0xa0 <main+0x5c>
+
+000000e4 <__vector_1>:
+
+} // Ende ISR (TIMER0_COMPA_vect)
+
+
+ISR(INT0_vect) // HighPowerLED´s ein / aus schalten! // #define TIMER1_START     TCCR1B |=   (1<<CS10);
+{	
+  e4:	1f 92       	push	r1
+  e6:	0f 92       	push	r0
+  e8:	0f b6       	in	r0, 0x3f	; 63
+  ea:	0f 92       	push	r0
+  ec:	11 24       	eor	r1, r1
+  ee:	8f 93       	push	r24
+	Auto_Off = 0; // Muss auf "0" gesetzt werden, sonst geht das Licht erst nach Tastendruck durch "key_UP" | "key_DOWN" aus		
+  f0:	10 92 6a 00 	sts	0x006A, r1
+  f4:	10 92 69 00 	sts	0x0069, r1
+	INT0_DISABLE;
+  f8:	89 b7       	in	r24, 0x39	; 57
+  fa:	8f 73       	andi	r24, 0x3F	; 63
+  fc:	89 bf       	out	0x39, r24	; 57
+
+	TIMER1_START;
+  fe:	8e b5       	in	r24, 0x2e	; 46
+ 100:	81 60       	ori	r24, 0x01	; 1
+ 102:	8e bd       	out	0x2e, r24	; 46
+
+
+	TCNT1= 0;
+ 104:	1d bc       	out	0x2d, r1	; 45
+ 106:	1c bc       	out	0x2c, r1	; 44
+
+} // Ende ISR (INT0_vect)
+ 108:	8f 91       	pop	r24
+ 10a:	0f 90       	pop	r0
+ 10c:	0f be       	out	0x3f, r0	; 63
+ 10e:	0f 90       	pop	r0
+ 110:	1f 90       	pop	r1
+ 112:	18 95       	reti
+
+00000114 <__vector_4>:
+		SOS();
+	} // Ende ISR (INT1_vect)
+
+
+	ISR(TIMER1_COMPA_vect) // Ist der OCR1A Wert erreicht, werden die HighPowerLED´s aus geschaltet
+	{
+ 114:	1f 92       	push	r1
+ 116:	0f 92       	push	r0
+ 118:	0f b6       	in	r0, 0x3f	; 63
+ 11a:	0f 92       	push	r0
+ 11c:	11 24       	eor	r1, r1
+		XPE_1_AUS;
+ 11e:	c0 98       	cbi	0x18, 0	; 24
+		XPE_2_AUS;
+ 120:	c1 98       	cbi	0x18, 1	; 24
+		XPE_3_AUS;
+ 122:	c2 98       	cbi	0x18, 2	; 24
+		XPE_4_AUS;
+ 124:	c3 98       	cbi	0x18, 3	; 24
+	} // Ende ISR (TIMER1_COMPA_vect)
+ 126:	0f 90       	pop	r0
+ 128:	0f be       	out	0x3f, r0	; 63
+ 12a:	0f 90       	pop	r0
+ 12c:	1f 90       	pop	r1
+ 12e:	18 95       	reti
+
+00000130 <__vector_5>:
+
+
+	ISR(TIMER1_OVF_vect) // Schaltet nach jedem Überlauf ( Overflow ) die HighPowerLED´s an
+	{	
+ 130:	1f 92       	push	r1
+ 132:	0f 92       	push	r0
+ 134:	0f b6       	in	r0, 0x3f	; 63
+ 136:	0f 92       	push	r0
+ 138:	11 24       	eor	r1, r1
+		XPE_1_AN;
+ 13a:	c0 9a       	sbi	0x18, 0	; 24
+		XPE_2_AN;
+ 13c:	c1 9a       	sbi	0x18, 1	; 24
+		XPE_3_AN;
+ 13e:	c2 9a       	sbi	0x18, 2	; 24
+		XPE_4_AN;	
+ 140:	c3 9a       	sbi	0x18, 3	; 24
+	} // Ende ISR (TIMER1_OVF_vect)
+ 142:	0f 90       	pop	r0
+ 144:	0f be       	out	0x3f, r0	; 63
+ 146:	0f 90       	pop	r0
+ 148:	1f 90       	pop	r1
+ 14a:	18 95       	reti
+
+0000014c <SOS>:
+*																								   *
+***************************************************************************************************/
+
+void SOS() // Hier ist das Unterprogramm "SOS();"
+{	
+	TIMER1_STOP;
+ 14c:	8e b5       	in	r24, 0x2e	; 46
+ 14e:	8e 7f       	andi	r24, 0xFE	; 254
+ 150:	8e bd       	out	0x2e, r24	; 46
+	while(1)
+	{	
+		
+	uint8_t SOS_Counter;
+		
+	for (SOS_Counter = 0 ; SOS_Counter < 3 ; SOS_Counter++) // 3 x kurz
+ 152:	80 e0       	ldi	r24, 0x00	; 0
+	#else
+		//round up by default
+		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
+	#endif
+
+	__builtin_avr_delay_cycles(__ticks_dc);
+ 154:	93 e0       	ldi	r25, 0x03	; 3
+ 156:	20 e0       	ldi	r18, 0x00	; 0
+ 158:	3e c0       	rjmp	.+124    	; 0x1d6 <SOS+0x8a>
+	{
+		ALARM_AN ;
+ 15a:	c4 9a       	sbi	0x18, 4	; 24
+		XPE_1_AN ; XPE_2_AN ; XPE_3_AN ; XPE_4_AN ;
+ 15c:	c0 9a       	sbi	0x18, 0	; 24
+ 15e:	c1 9a       	sbi	0x18, 1	; 24
+ 160:	c2 9a       	sbi	0x18, 2	; 24
+ 162:	c3 9a       	sbi	0x18, 3	; 24
+ 164:	3f e7       	ldi	r19, 0x7F	; 127
+ 166:	49 ea       	ldi	r20, 0xA9	; 169
+ 168:	53 e0       	ldi	r21, 0x03	; 3
+ 16a:	31 50       	subi	r19, 0x01	; 1
+ 16c:	40 40       	sbci	r20, 0x00	; 0
+ 16e:	50 40       	sbci	r21, 0x00	; 0
+ 170:	e1 f7       	brne	.-8      	; 0x16a <SOS+0x1e>
+ 172:	00 c0       	rjmp	.+0      	; 0x174 <SOS+0x28>
+ 174:	00 00       	nop
+		_delay_ms(150);
+		ALARM_AUS ;
+ 176:	c4 98       	cbi	0x18, 4	; 24
+		XPE_1_AUS ; XPE_2_AUS ; XPE_3_AUS ; XPE_4_AUS ;
+ 178:	c0 98       	cbi	0x18, 0	; 24
+ 17a:	c1 98       	cbi	0x18, 1	; 24
+ 17c:	c2 98       	cbi	0x18, 2	; 24
+ 17e:	c3 98       	cbi	0x18, 3	; 24
+ 180:	3f e7       	ldi	r19, 0x7F	; 127
+ 182:	49 ea       	ldi	r20, 0xA9	; 169
+ 184:	53 e0       	ldi	r21, 0x03	; 3
+ 186:	31 50       	subi	r19, 0x01	; 1
+ 188:	40 40       	sbci	r20, 0x00	; 0
+ 18a:	50 40       	sbci	r21, 0x00	; 0
+ 18c:	e1 f7       	brne	.-8      	; 0x186 <SOS+0x3a>
+ 18e:	00 c0       	rjmp	.+0      	; 0x190 <SOS+0x44>
+ 190:	00 00       	nop
+		_delay_ms(150);
+			
+	if (!(PIND & (1<<key_ON)))
+ 192:	82 99       	sbic	0x10, 2	; 16
+ 194:	1d c0       	rjmp	.+58     	; 0x1d0 <SOS+0x84>
+	{
+
+		ALARM_AN;XPE_1_AN;XPE_2_AN;XPE_3_AN;XPE_4_AN;
+ 196:	c4 9a       	sbi	0x18, 4	; 24
+ 198:	c0 9a       	sbi	0x18, 0	; 24
+ 19a:	c1 9a       	sbi	0x18, 1	; 24
+ 19c:	c2 9a       	sbi	0x18, 2	; 24
+ 19e:	c3 9a       	sbi	0x18, 3	; 24
+ 1a0:	8f ef       	ldi	r24, 0xFF	; 255
+ 1a2:	9e e9       	ldi	r25, 0x9E	; 158
+ 1a4:	24 e2       	ldi	r18, 0x24	; 36
+ 1a6:	81 50       	subi	r24, 0x01	; 1
+ 1a8:	90 40       	sbci	r25, 0x00	; 0
+ 1aa:	20 40       	sbci	r18, 0x00	; 0
+ 1ac:	e1 f7       	brne	.-8      	; 0x1a6 <SOS+0x5a>
+ 1ae:	00 c0       	rjmp	.+0      	; 0x1b0 <SOS+0x64>
+ 1b0:	00 00       	nop
+		_delay_ms(1500);
+		ALARM_AUS;XPE_1_AUS;XPE_2_AUS;XPE_3_AUS;XPE_4_AUS;
+ 1b2:	c4 98       	cbi	0x18, 4	; 24
+ 1b4:	c0 98       	cbi	0x18, 0	; 24
+ 1b6:	c1 98       	cbi	0x18, 1	; 24
+ 1b8:	c2 98       	cbi	0x18, 2	; 24
+ 1ba:	c3 98       	cbi	0x18, 3	; 24
+ 1bc:	3f ef       	ldi	r19, 0xFF	; 255
+ 1be:	49 e6       	ldi	r20, 0x69	; 105
+ 1c0:	58 e1       	ldi	r21, 0x18	; 24
+ 1c2:	31 50       	subi	r19, 0x01	; 1
+ 1c4:	40 40       	sbci	r20, 0x00	; 0
+ 1c6:	50 40       	sbci	r21, 0x00	; 0
+ 1c8:	e1 f7       	brne	.-8      	; 0x1c2 <SOS+0x76>
+ 1ca:	00 c0       	rjmp	.+0      	; 0x1cc <SOS+0x80>
+ 1cc:	00 00       	nop
+ 1ce:	08 95       	ret
+	while(1)
+	{	
+		
+	uint8_t SOS_Counter;
+		
+	for (SOS_Counter = 0 ; SOS_Counter < 3 ; SOS_Counter++) // 3 x kurz
+ 1d0:	8f 5f       	subi	r24, 0xFF	; 255
+ 1d2:	01 c0       	rjmp	.+2      	; 0x1d6 <SOS+0x8a>
+ 1d4:	82 2f       	mov	r24, r18
+ 1d6:	83 30       	cpi	r24, 0x03	; 3
+ 1d8:	08 f4       	brcc	.+2      	; 0x1dc <SOS+0x90>
+ 1da:	bf cf       	rjmp	.-130    	; 0x15a <SOS+0xe>
+ 1dc:	8f ef       	ldi	r24, 0xFF	; 255
+ 1de:	39 e6       	ldi	r19, 0x69	; 105
+ 1e0:	48 e1       	ldi	r20, 0x18	; 24
+ 1e2:	81 50       	subi	r24, 0x01	; 1
+ 1e4:	30 40       	sbci	r19, 0x00	; 0
+ 1e6:	40 40       	sbci	r20, 0x00	; 0
+ 1e8:	e1 f7       	brne	.-8      	; 0x1e2 <SOS+0x96>
+ 1ea:	00 c0       	rjmp	.+0      	; 0x1ec <SOS+0xa0>
+ 1ec:	00 00       	nop
+ 1ee:	89 2f       	mov	r24, r25
+		
+			_delay_ms(1000);
+		
+	for (SOS_Counter = 0 ; SOS_Counter < 3 ; SOS_Counter++) // 3 x lang
+	{
+		ALARM_AN ;
+ 1f0:	c4 9a       	sbi	0x18, 4	; 24
+		XPE_1_AN ; XPE_2_AN ; XPE_3_AN ; XPE_4_AN;
+ 1f2:	c0 9a       	sbi	0x18, 0	; 24
+ 1f4:	c1 9a       	sbi	0x18, 1	; 24
+ 1f6:	c2 9a       	sbi	0x18, 2	; 24
+ 1f8:	c3 9a       	sbi	0x18, 3	; 24
+ 1fa:	5f e7       	ldi	r21, 0x7F	; 127
+ 1fc:	30 ec       	ldi	r19, 0xC0	; 192
+ 1fe:	44 e1       	ldi	r20, 0x14	; 20
+ 200:	51 50       	subi	r21, 0x01	; 1
+ 202:	30 40       	sbci	r19, 0x00	; 0
+ 204:	40 40       	sbci	r20, 0x00	; 0
+ 206:	e1 f7       	brne	.-8      	; 0x200 <SOS+0xb4>
+ 208:	00 c0       	rjmp	.+0      	; 0x20a <SOS+0xbe>
+ 20a:	00 00       	nop
+		_delay_ms(850);
+		ALARM_AUS ;
+ 20c:	c4 98       	cbi	0x18, 4	; 24
+		XPE_1_AUS ; XPE_2_AUS ; XPE_3_AUS ; XPE_4_AUS;
+ 20e:	c0 98       	cbi	0x18, 0	; 24
+ 210:	c1 98       	cbi	0x18, 1	; 24
+ 212:	c2 98       	cbi	0x18, 2	; 24
+ 214:	c3 98       	cbi	0x18, 3	; 24
+ 216:	5f e7       	ldi	r21, 0x7F	; 127
+ 218:	30 ec       	ldi	r19, 0xC0	; 192
+ 21a:	44 e1       	ldi	r20, 0x14	; 20
+ 21c:	51 50       	subi	r21, 0x01	; 1
+ 21e:	30 40       	sbci	r19, 0x00	; 0
+ 220:	40 40       	sbci	r20, 0x00	; 0
+ 222:	e1 f7       	brne	.-8      	; 0x21c <SOS+0xd0>
+ 224:	00 c0       	rjmp	.+0      	; 0x226 <SOS+0xda>
+ 226:	00 00       	nop
+ 228:	81 50       	subi	r24, 0x01	; 1
+
+		}// Ende for SOS_Counter
+		
+			_delay_ms(1000);
+		
+	for (SOS_Counter = 0 ; SOS_Counter < 3 ; SOS_Counter++) // 3 x lang
+ 22a:	11 f7       	brne	.-60     	; 0x1f0 <SOS+0xa4>
+ 22c:	d3 cf       	rjmp	.-90     	; 0x1d4 <SOS+0x88>
+
+0000022e <__vector_2>:
+
+} // Ende ISR (INT0_vect)
+
+
+	ISR(INT1_vect) // Wird die Taste "key_SOS" gedrückt, läuft das Unterprogramm ( SOS(); ) ab
+	{
+ 22e:	1f 92       	push	r1
+ 230:	0f 92       	push	r0
+ 232:	0f b6       	in	r0, 0x3f	; 63
+ 234:	0f 92       	push	r0
+ 236:	11 24       	eor	r1, r1
+ 238:	2f 93       	push	r18
+ 23a:	3f 93       	push	r19
+ 23c:	4f 93       	push	r20
+ 23e:	5f 93       	push	r21
+ 240:	6f 93       	push	r22
+ 242:	7f 93       	push	r23
+ 244:	8f 93       	push	r24
+ 246:	9f 93       	push	r25
+ 248:	af 93       	push	r26
+ 24a:	bf 93       	push	r27
+ 24c:	ef 93       	push	r30
+ 24e:	ff 93       	push	r31
+		SOS();
+ 250:	7d df       	rcall	.-262    	; 0x14c <SOS>
+	} // Ende ISR (INT1_vect)
+ 252:	ff 91       	pop	r31
+ 254:	ef 91       	pop	r30
+ 256:	bf 91       	pop	r27
+ 258:	af 91       	pop	r26
+ 25a:	9f 91       	pop	r25
+ 25c:	8f 91       	pop	r24
+ 25e:	7f 91       	pop	r23
+ 260:	6f 91       	pop	r22
+ 262:	5f 91       	pop	r21
+ 264:	4f 91       	pop	r20
+ 266:	3f 91       	pop	r19
+ 268:	2f 91       	pop	r18
+ 26a:	0f 90       	pop	r0
+ 26c:	0f be       	out	0x3f, r0	; 63
+ 26e:	0f 90       	pop	r0
+ 270:	1f 90       	pop	r1
+ 272:	18 95       	reti
+
+00000274 <get_key_rpt>:
+	return key_mask;
+}
+
+uint8_t get_key_rpt( uint8_t key_mask )
+{
+	cli();                                          // read and clear atomic !
+ 274:	f8 94       	cli
+	key_mask &= key_rpt;                            // read key(s)
+ 276:	90 91 6b 00 	lds	r25, 0x006B
+ 27a:	89 23       	and	r24, r25
+	key_rpt ^= key_mask;                            // clear key(s)
+ 27c:	90 91 6b 00 	lds	r25, 0x006B
+ 280:	98 27       	eor	r25, r24
+ 282:	90 93 6b 00 	sts	0x006B, r25
+	sei();
+ 286:	78 94       	sei
+	return key_mask;
+ 288:	08 95       	ret
+
+0000028a <debounce_key>:
+void debounce_key(void)
+{
+		static uint8_t ct0, ct1, rpt;
+		uint8_t i;
+		
+		i = key_state ^ ~PIND;					// key changed ?
+ 28a:	80 b3       	in	r24, 0x10	; 16
+ 28c:	90 91 6f 00 	lds	r25, 0x006F
+ 290:	80 95       	com	r24
+ 292:	89 27       	eor	r24, r25
+		ct0 = ~( ct0 & i );						// reset or count ct0
+ 294:	90 91 62 00 	lds	r25, 0x0062
+ 298:	98 23       	and	r25, r24
+ 29a:	90 95       	com	r25
+ 29c:	90 93 62 00 	sts	0x0062, r25
+		ct1 = ct0 ^ (ct1 & i);					// reset or count ct1
+ 2a0:	20 91 61 00 	lds	r18, 0x0061
+ 2a4:	28 23       	and	r18, r24
+ 2a6:	29 27       	eor	r18, r25
+ 2a8:	20 93 61 00 	sts	0x0061, r18
+		i &= ct0 & ct1;							// count until roll over ?
+ 2ac:	89 23       	and	r24, r25
+ 2ae:	82 23       	and	r24, r18
+		key_state ^= i;							// then toggle debounced state
+ 2b0:	90 91 6f 00 	lds	r25, 0x006F
+ 2b4:	98 27       	eor	r25, r24
+ 2b6:	90 93 6f 00 	sts	0x006F, r25
+		key_press |= key_state & i;				// 0->1: key press detect
+ 2ba:	90 91 6f 00 	lds	r25, 0x006F
+ 2be:	20 91 6e 00 	lds	r18, 0x006E
+ 2c2:	89 23       	and	r24, r25
+ 2c4:	82 2b       	or	r24, r18
+ 2c6:	80 93 6e 00 	sts	0x006E, r24
+		
+		if( (key_state & (0b00001111)) == 0 )	// check repeat function
+ 2ca:	80 91 6f 00 	lds	r24, 0x006F
+ 2ce:	8f 70       	andi	r24, 0x0F	; 15
+ 2d0:	21 f4       	brne	.+8      	; 0x2da <debounce_key+0x50>
+		rpt = 5;								// start delay
+		if(--rpt == 0 )
+ 2d2:	84 e0       	ldi	r24, 0x04	; 4
+ 2d4:	80 93 60 00 	sts	0x0060, r24
+ 2d8:	12 c0       	rjmp	.+36     	; 0x2fe <debounce_key+0x74>
+ 2da:	80 91 60 00 	lds	r24, 0x0060
+ 2de:	81 50       	subi	r24, 0x01	; 1
+ 2e0:	19 f0       	breq	.+6      	; 0x2e8 <debounce_key+0x5e>
+ 2e2:	80 93 60 00 	sts	0x0060, r24
+ 2e6:	0b c0       	rjmp	.+22     	; 0x2fe <debounce_key+0x74>
+		{
+			rpt = 5;                            // repeat delay
+ 2e8:	85 e0       	ldi	r24, 0x05	; 5
+ 2ea:	80 93 60 00 	sts	0x0060, r24
+			key_rpt |= key_state & (0b00001111);
+ 2ee:	80 91 6f 00 	lds	r24, 0x006F
+ 2f2:	90 91 6b 00 	lds	r25, 0x006B
+ 2f6:	8f 70       	andi	r24, 0x0F	; 15
+ 2f8:	89 2b       	or	r24, r25
+ 2fa:	80 93 6b 00 	sts	0x006B, r24
+		}
+		
+		
+		
+		if (get_key_rpt((1<<PD0)))
+ 2fe:	81 e0       	ldi	r24, 0x01	; 1
+ 300:	b9 df       	rcall	.-142    	; 0x274 <get_key_rpt>
+ 302:	88 23       	and	r24, r24
+ 304:	31 f0       	breq	.+12     	; 0x312 <debounce_key+0x88>
+		{
+			OCR1A = OCR1A - 6553; // Überlauf um "13107" erhöhen
+ 306:	8a b5       	in	r24, 0x2a	; 42
+ 308:	9b b5       	in	r25, 0x2b	; 43
+ 30a:	89 59       	subi	r24, 0x99	; 153
+ 30c:	99 41       	sbci	r25, 0x19	; 25
+ 30e:	9b bd       	out	0x2b, r25	; 43
+ 310:	8a bd       	out	0x2a, r24	; 42
+		}
+		
+		
+
+		if (get_key_rpt((1<<PD1)))
+ 312:	82 e0       	ldi	r24, 0x02	; 2
+ 314:	af df       	rcall	.-162    	; 0x274 <get_key_rpt>
+ 316:	88 23       	and	r24, r24
+ 318:	31 f0       	breq	.+12     	; 0x326 <debounce_key+0x9c>
+		{
+			OCR1A = OCR1A + 6553; // Überlauf um "13107" erhöhen
+ 31a:	8a b5       	in	r24, 0x2a	; 42
+ 31c:	9b b5       	in	r25, 0x2b	; 43
+ 31e:	87 56       	subi	r24, 0x67	; 103
+ 320:	96 4e       	sbci	r25, 0xE6	; 230
+ 322:	9b bd       	out	0x2b, r25	; 43
+ 324:	8a bd       	out	0x2a, r24	; 42
+ 326:	08 95       	ret
+
+00000328 <__vector_13>:
+	
+}// Ende Main
+
+
+ISR(TIMER0_COMPA_vect) // Sorgt dafür das die Akkus / Batterien geschont werden! (Abschaltung nach ca. 10 min.) 
+{
+ 328:	1f 92       	push	r1
+ 32a:	0f 92       	push	r0
+ 32c:	0f b6       	in	r0, 0x3f	; 63
+ 32e:	0f 92       	push	r0
+ 330:	11 24       	eor	r1, r1
+ 332:	2f 93       	push	r18
+ 334:	3f 93       	push	r19
+ 336:	4f 93       	push	r20
+ 338:	5f 93       	push	r21
+ 33a:	6f 93       	push	r22
+ 33c:	7f 93       	push	r23
+ 33e:	8f 93       	push	r24
+ 340:	9f 93       	push	r25
+ 342:	af 93       	push	r26
+ 344:	bf 93       	push	r27
+ 346:	ef 93       	push	r30
+ 348:	ff 93       	push	r31
+	
+	Auto_Off ++; // Jede 10ms Auto_Off um 1 erhöhen!	
+ 34a:	80 91 69 00 	lds	r24, 0x0069
+ 34e:	90 91 6a 00 	lds	r25, 0x006A
+ 352:	01 96       	adiw	r24, 0x01	; 1
+ 354:	90 93 6a 00 	sts	0x006A, r25
+ 358:	80 93 69 00 	sts	0x0069, r24
+
+	debounce_key();
+ 35c:	96 df       	rcall	.-212    	; 0x28a <debounce_key>
+	
+	static uint8_t delay_cnt;
+			
+	if ((function_flg & 0x01) == 0x01)
+ 35e:	80 91 6c 00 	lds	r24, 0x006C
+ 362:	80 ff       	sbrs	r24, 0
+ 364:	14 c0       	rjmp	.+40     	; 0x38e <__vector_13+0x66>
+	{
+		delay_cnt++;
+ 366:	80 91 63 00 	lds	r24, 0x0063
+ 36a:	8f 5f       	subi	r24, 0xFF	; 255
+ 36c:	80 93 63 00 	sts	0x0063, r24
+				
+		if (delay_cnt >= 0x01)
+ 370:	88 23       	and	r24, r24
+ 372:	69 f0       	breq	.+26     	; 0x38e <__vector_13+0x66>
+		{
+			ALARM_AN;
+ 374:	c4 9a       	sbi	0x18, 4	; 24
+		}
+				
+		if (delay_cnt >= 0x0B)
+ 376:	80 91 63 00 	lds	r24, 0x0063
+ 37a:	8b 30       	cpi	r24, 0x0B	; 11
+ 37c:	40 f0       	brcs	.+16     	; 0x38e <__vector_13+0x66>
+		{
+			delay_cnt = 0x00;
+ 37e:	10 92 63 00 	sts	0x0063, r1
+			ALARM_AUS;
+ 382:	c4 98       	cbi	0x18, 4	; 24
+			function_flg &= ~(0x01);
+ 384:	80 91 6c 00 	lds	r24, 0x006C
+ 388:	8e 7f       	andi	r24, 0xFE	; 254
+ 38a:	80 93 6c 00 	sts	0x006C, r24
+		}
+	}
+	
+	if (PIND & (1<<PIND2))
+ 38e:	82 9b       	sbis	0x10, 2	; 16
+ 390:	03 c0       	rjmp	.+6      	; 0x398 <__vector_13+0x70>
+	{
+		INT0_ENABLE;
+ 392:	89 b7       	in	r24, 0x39	; 57
+ 394:	80 6c       	ori	r24, 0xC0	; 192
+ 396:	89 bf       	out	0x39, r24	; 57
+	}
+
+		Auto_Off= 0x00;
+ 398:	10 92 6a 00 	sts	0x006A, r1
+ 39c:	10 92 69 00 	sts	0x0069, r1
+		
+
+		Auto_Off=0;
+ 3a0:	10 92 6a 00 	sts	0x006A, r1
+ 3a4:	10 92 69 00 	sts	0x0069, r1
+
+
+	
+
+} // Ende ISR (TIMER0_COMPA_vect)
+ 3a8:	ff 91       	pop	r31
+ 3aa:	ef 91       	pop	r30
+ 3ac:	bf 91       	pop	r27
+ 3ae:	af 91       	pop	r26
+ 3b0:	9f 91       	pop	r25
+ 3b2:	8f 91       	pop	r24
+ 3b4:	7f 91       	pop	r23
+ 3b6:	6f 91       	pop	r22
+ 3b8:	5f 91       	pop	r21
+ 3ba:	4f 91       	pop	r20
+ 3bc:	3f 91       	pop	r19
+ 3be:	2f 91       	pop	r18
+ 3c0:	0f 90       	pop	r0
+ 3c2:	0f be       	out	0x3f, r0	; 63
+ 3c4:	0f 90       	pop	r0
+ 3c6:	1f 90       	pop	r1
+ 3c8:	18 95       	reti
+
+000003ca <_exit>:
+ 3ca:	f8 94       	cli
+
+000003cc <__stop_program>:
+ 3cc:	ff cf       	rjmp	.-2      	; 0x3cc <__stop_program>
